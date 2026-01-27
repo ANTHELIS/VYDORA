@@ -126,9 +126,41 @@ const reGenerateAccessToken = asyncHandler(async (req, res)=>{
 const changeCurrentPassword = asyncHandler(async()=>{
     const {oldPasssword, newPassword} = req.body;
     const user = await User.findById(req.user?._id);
-    
+    const isPasswordCorrect = await user.isPasswordCorrect(oldPasssword);
+    if(!isPasswordCorrect) throw new apiError(401, "oldPasswowrd is invalid");
+
+    user.password = newPassword;
+    await user.save({ validateBeforeSave: false });
+    return res.status(200).json(
+        new apiResponse(200, {}, "password updated succesfully")
+    )      
+})
+
+const getCurrentUser = asyncHandler(async(req, res)=>{
+    return res.status(200).json(
+        new apiResponse(200, req.user, "currrent user fetched succesfully")
+    ) 
+})
+
+const updateAccountBodyDetails = asyncHandler(async(req, res)=>{
+    const { fullName, email } = req.body;
+    if(!fullName || !email) throw new apiError(400, "all fields are required");
+
+    const user = await User.findByIdAndUpdate(req.user?._id, 
+        {
+            $set: {
+                fullName, email
+            }
+        },
+        {
+            new: true
+        }
+    ).select("-password -refreshToken");
+
+    if(!user) throw new apiError(500, "user data updation failed");
+    return new apiResponse(200, user, "user data updated successfully");
 })
 
 
 
-export {registerUser, loginUser, logoutUser, reGenerateAccessToken}
+export {registerUser, loginUser, logoutUser, reGenerateAccessToken, changeCurrentPassword, getCurrentUser, updateAccountBodyDetails}
