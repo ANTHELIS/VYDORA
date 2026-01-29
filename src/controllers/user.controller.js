@@ -161,6 +161,32 @@ const updateAccountBodyDetails = asyncHandler(async(req, res)=>{
     return new apiResponse(200, user, "user data updated successfully");
 })
 
+const updateUserAvatar = asyncHandler(async(req, res)=>{
+    const avatarLocalPath = req.file?.path;
+    if(!avatarLocalPath) throw new apiError(400, "avatar file is missing");
+    const uploadDetails = await uploadOnCloudinary(avatarLocalPath);
+    if(!uploadDetails) throw new apiError(500, "avatar file upload failed");
+    const user = await User.findByIdAndUpdate(req.user?._id, {
+        $set:{
+            avatar: uploadDetails.url
+        }
+    }, {new: true}).select("-password -refreshToken");;
+    return new apiResponse(200, user, "avatar updated successfully");
+})
+
+const updateUserCoverImage = asyncHandler(async(req, res)=>{
+    const coverImageLocalPath = req.file?.path;
+    if(!coverImageLocalPath) throw new apiError(400, "coverImage file is missing");
+    const uploadDetails = await uploadOnCloudinary(coverImageLocalPath);
+    if(!uploadDetails) throw new apiError(500, "coverImage file upload failed");
+    const user = await User.findByIdAndUpdate(req.user?._id, {
+        $set:{
+            coverImage: uploadDetails.url
+        }
+    }, {new: true}).select("-password -refreshToken");
+    return new apiResponse(200, user, "coverImage updated successfully");
+})
 
 
-export {registerUser, loginUser, logoutUser, reGenerateAccessToken, changeCurrentPassword, getCurrentUser, updateAccountBodyDetails}
+
+export {registerUser, loginUser, logoutUser, reGenerateAccessToken, changeCurrentPassword, getCurrentUser, updateAccountBodyDetails, updateUserAvatar, updateUserCoverImage}
