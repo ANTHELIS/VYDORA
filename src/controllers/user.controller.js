@@ -160,7 +160,7 @@ const updateAccountBodyDetails = asyncHandler(async(req, res)=>{
     ).select("-password -refreshToken");
 
     if(!user) throw new apiError(500, "user data updation failed");
-    return new apiResponse(200, user, "user data updated successfully");
+    return res.status(200).json(new apiResponse(200, user, "user data updated successfully")) ;
 })
 
 const updateUserAvatar = asyncHandler(async(req, res)=>{
@@ -173,7 +173,7 @@ const updateUserAvatar = asyncHandler(async(req, res)=>{
             avatar: uploadDetails.url
         }
     }, {new: true}).select("-password -refreshToken");;
-    return new apiResponse(200, user, "avatar updated successfully");
+    return res.status(200).json(new apiResponse(200, user, "avatar updated successfully")) ;
 })
 
 const updateUserCoverImage = asyncHandler(async(req, res)=>{
@@ -186,7 +186,7 @@ const updateUserCoverImage = asyncHandler(async(req, res)=>{
             coverImage: uploadDetails.url
         }
     }, {new: true}).select("-password -refreshToken");
-    return new apiResponse(200, user, "coverImage updated successfully");
+    return res.status(200).json(new apiResponse(200, user, "coverImage updated successfully")) ;
 })
 
 const getChannelDetails = asyncHandler(async(req, res)=>{
